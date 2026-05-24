@@ -13,14 +13,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 8
+      - name: Set up JDK 17 (for Android SDK tools)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: "platforms;android-33 build-tools;33.0.0"
+
+      - name: Set up JDK 8 (for Gradle 3.3 build)
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "8"
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
 
       - name: Grant execute permission
         run: chmod +x AhMyth-Android-RAT-master/AhMyth-Client/gradlew
@@ -28,7 +36,7 @@ jobs:
       - name: Build APK (Debug)
         run: |
           cd AhMyth-Android-RAT-master/AhMyth-Client
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
