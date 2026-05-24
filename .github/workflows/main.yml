@@ -29,15 +29,16 @@ jobs:
         run: find . -name gradlew
 
       - name: Grant execute permission
-        run: chmod +x AhMyth-Client/gradlew || true
+        run: chmod +x AhMyth-Android-RAT-master/AhMyth-Client/gradlew || true
 
       - name: Build APK (Debug)
         run: |
-          cd AhMyth-Client
+          cd AhMyth-Android-RAT-master/AhMyth-Client
           ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          path: AhMyth-Client/app/build/outputs/apk/debug/*.apk
+          path: AhMyth-Android-RAT-master/AhMyth-Client/app/build/outputs/apk/debug/*.apk
+
