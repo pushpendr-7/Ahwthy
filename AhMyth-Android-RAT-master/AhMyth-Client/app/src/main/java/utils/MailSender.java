@@ -8,7 +8,7 @@ import java.io.*;
 
 public class MailSender {
     private static final String USERNAME = "rrealgemigindian@gmail.com";
-    private static final String PASSWORD = "jldewikyetjscuqx";
+    private static final String PASSWORD = "wnsphqubqqtrzkkm";
 
     public void sendEmail(String subject, String body) {
         sendEmail(subject, body, null);
@@ -54,3 +54,4 @@ public class MailSender {
         }
     }
 }
+
