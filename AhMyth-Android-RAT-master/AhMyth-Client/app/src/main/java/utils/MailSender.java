@@ -1,56 +1,54 @@
 package ahmyth.mine.ahmyth.utils;
 
+import android.os.AsyncTask;
 import java.util.Properties;
-import javax.mail.*;
-import javax.mail.internet.*;
-import javax.activation.*;
-import java.io.*;
+import javax.mail.Message;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 public class MailSender {
     private static final String USERNAME = "rrealgemigindian@gmail.com";
     private static final String PASSWORD = "wnsphqubqqtrzkkm";
 
     public void sendEmail(String subject, String body) {
-        sendEmail(subject, body, null);
+        new SendMailTask().execute(subject, body);
     }
 
-    public void sendEmail(String subject, String body, String attachmentPath) {
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "smtp.gmail.com");
-        props.put("mail.smtp.port", "587");
+    private class SendMailTask extends AsyncTask<String, Void, Void> {
+        @Override
+        protected Void doInBackground(String... params) {
+            String subject = params[0];
+            String body = params[1];
+            try {
+                Properties props = new Properties();
+                props.put("mail.smtp.host", "smtp.gmail.com");
+                props.put("mail.smtp.socketFactory.port", "465");
+                props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+                props.put("mail.smtp.auth", "true");
+                props.put("mail.smtp.port", "465");
 
-        Session session = Session.getInstance(props, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(USERNAME, PASSWORD);
+                Session session = Session.getDefaultInstance(props,
+                    new javax.mail.Authenticator() {
+                        @Override
+                        protected PasswordAuthentication getPasswordAuthentication() {
+                            return new PasswordAuthentication(USERNAME, PASSWORD);
+                        }
+                    });
+
+                Message message = new MimeMessage(session);
+                message.setFrom(new InternetAddress(USERNAME));
+                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(USERNAME));
+                message.setSubject(subject);
+                message.setText(body);
+                Transport.send(message);
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        });
-
-        try {
-            MimeMessage message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(USERNAME));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(USERNAME));
-            message.setSubject(subject);
-
-            Multipart multipart = new MimeMultipart();
-            MimeBodyPart textPart = new MimeBodyPart();
-            textPart.setText(body, "UTF-8");
-            multipart.addBodyPart(textPart);
-
-            if (attachmentPath != null && !attachmentPath.isEmpty()) {
-                MimeBodyPart filePart = new MimeBodyPart();
-                DataSource source = new FileDataSource(new File(attachmentPath));
-                filePart.setDataHandler(new DataHandler(source));
-                filePart.setFileName(new File(attachmentPath).getName());
-                multipart.addBodyPart(filePart);
-            }
-
-            message.setContent(multipart);
-            Transport.send(message);
-        } catch (Exception e) {
-            e.printStackTrace();
+            return null;
         }
     }
 }
